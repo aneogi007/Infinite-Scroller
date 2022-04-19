@@ -1,0 +1,5 @@
+﻿  glstate.cpp
+C:\Users\aneog\OneDrive\Documents\CpuGraph\ScrollerGame\base_freeglut\src\glstate.cpp(5,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  main.cpp
+  Generating Code...
+  base_freeglut.vcxproj -> C:\Users\aneog\OneDrive\Documents\CpuGraph\ScrollerGame\base_freeglut\x64\Debug\base_freeglut.exe
