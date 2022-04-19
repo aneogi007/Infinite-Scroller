@@ -59,10 +59,8 @@ void Scene::parseScene() {  // TODO: rewrite
 			  	tx,  ty,  tz,  1 
 			);
 
-			if (mesh->getModelType() == "car") {
-				glm::vec3 scale = glm::vec3(0.1, 0.1, 0.1);
-				model = glm::scale(model, scale);
-
+			if (mesh->getModelType() == "floor" || mesh->getModelType() == "obstacle") {
+				mesh->setStartModelMat(model);
 			}
 
 			mesh->setModelMat(model);

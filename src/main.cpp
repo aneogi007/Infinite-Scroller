@@ -54,6 +54,7 @@ int main(int argc, char** argv) {
 // Setup window and callbacks
 void initGLUT(int* argc, char** argv) {
 	// Set window and context settings
+	//int width = 1920; int height = 1080;
 	int width = 800; int height = 800;
 	glutInit(argc, argv);
 	glutInitWindowSize(width, height);
@@ -98,7 +99,7 @@ void reshape(GLint width, GLint height) {
 
 void keyPress(unsigned char key, int x, int y) {	// TODO
 	switch (key) {
-	case 's':  // switch camera
+	case 's':  // switch camera	
 		glState->switchCam();
 		glutPostRedisplay();	// Request redraw
 		break;
@@ -119,19 +120,13 @@ void keyPress(unsigned char key, int x, int y) {	// TODO
 	// 	glutPostRedisplay();
 	// 	break;
 	case 'a': {
-		auto curObj = glState->scene->getSceneObjects()[glState->getSpaceShip()];  // Currently controlled object
-		auto curModelMat = curObj->getModelMat();  // Its model matrix
-		glm::mat4 newModelMat = glm::translate(glm::mat4(1.0f), glm::vec3(-glState->getMoveStep(), 0.0f, 0.0f)) * curModelMat;
-		curObj->setModelMat(newModelMat);
-		glutPostRedisplay();
+		auto ship = glState->scene->getSceneObjects()[glState->getSpaceShip()];  // Currently controlled object
+		ship->moveLeft(glState->getPlayerSpeed());
 		break;
 	}
 	case 'd': {
-		auto curObj = glState->scene->getSceneObjects()[glState->getSpaceShip()];  // Currently controlled object
-		auto curModelMat = curObj->getModelMat();  // Its model matrix
-		glm::mat4 newModelMat = glm::translate(glm::mat4(1.0f), glm::vec3(glState->getMoveStep(), 0.0f, 0.0f)) * curModelMat;
-		curObj->setModelMat(newModelMat);
-		glutPostRedisplay();
+		auto ship = glState->scene->getSceneObjects()[glState->getSpaceShip()];  // Currently controlled object
+		ship->moveRight(glState->getPlayerSpeed());
 		break;
 	}
 	default:
@@ -152,6 +147,7 @@ void keyRelease(unsigned char key, int x, int y) {
 void idle() {
 	// anything that happens every frame (e.g. movement) should be done here
 	// Be sure to call glutPostRedisplay() if the screen needs to update as well
+	glutPostRedisplay();
 }
 
 // Called when a menu button is pressed

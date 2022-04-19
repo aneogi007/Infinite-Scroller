@@ -35,12 +35,17 @@ public:
 		whichCam = (whichCam == GROUND_VIEW) ? OVERHEAD_VIEW : GROUND_VIEW;
 	}
 
+	//PLAYER OBJECT
 	//SpaceShip
 	inline int getSpaceShip() const { return SpaceShip; }
-	//get list of objects
-	//inline std::vector<std::shared_ptr<Mesh>>& getObjects() { return objects; }
+	inline int getGround() const { return Ground; }
 
+	//movement speed
 	inline float getMoveStep() { return moveStep; }
+
+	inline float getPlayerSpeed() { return playerSpeed; }
+	inline void setPlayerSpeed(float newSpeed) { playerSpeed = newSpeed; }
+	
 	
 
 protected:
@@ -59,7 +64,19 @@ protected:
 
 	// Index of SpaceShip
 	unsigned int SpaceShip = 0;
+	unsigned int Ground = 0;
+
 	float moveStep = 0.5f;  // Move step
+
+	//MOVING BACKGROUND PARAMETERS
+	// Floor Position and Velocity Vector
+	float mapVelocity = 0.03f;
+
+	//Player Speed
+	float playerSpeed = 0.3f;
+
+	bool detectCollision(std::shared_ptr<Mesh> ship, std::shared_ptr<Mesh> obstacle);
+
 
 };
 

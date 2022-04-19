@@ -34,6 +34,7 @@ void GLState::initializeGL() {
 
 // Called when window requests a screen redraw
 void GLState::paintGL() {
+	// std::cout << "HELLLO " << ", ";
 	// Clear the color and depth buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -44,7 +45,25 @@ void GLState::paintGL() {
 	glm::mat4 xform(1.0f), proj, view;
 
 	auto objects = scene->getSceneObjects();
+
+	//scene->printMat4(objects[0]->getModelMat());
+	
 	for (auto& meshObj : objects) {
+		if (meshObj->getModelType() == "floor" || meshObj->getModelType() == "obstacle") {
+			meshObj->moveBack(mapVelocity);
+		}
+
+		
+		// if (meshObj->getModelType() == "car") {
+
+		// 	auto bBox = meshObj->boundingBox();
+		// 	glm::vec3 minBB = bBox.first;
+		// 	glm::vec3 maxBB = bBox.second;
+
+		// 	scene->printVec3(minBB);
+		// 	scene->printVec3(maxBB);
+		// }
+
 		glm::mat4 modelMat = meshObj->getModelMat();
 		proj = (whichCam == GROUND_VIEW) ? camGround.getProj() : camOverhead.getProj();
 		view = (whichCam == GROUND_VIEW) ? camGround.getView() : camOverhead.getView();
@@ -52,7 +71,16 @@ void GLState::paintGL() {
 		glUniformMatrix4fv(xformLoc, 1, GL_FALSE, glm::value_ptr(xform));
 		// Draw the mesh
 		meshObj->draw();
-	}		
+	}
+
+
+	if	((!objects[2]->isdestroyed()) && detectCollision((objects[0]),(objects[2]))) {
+		std::cout << "COLLISION DETECTED " << ", ";
+	}
+
+	if	((!objects[3]->isdestroyed()) && detectCollision((objects[0]),(objects[3]))) {
+		std::cout << "COLLISION DETECTED " << ", ";
+	}
 
 	glUseProgram(0);
 }
@@ -79,4 +107,26 @@ void GLState::initShaders() {
 
 	// Get uniform locations
 	xformLoc = glGetUniformLocation(shader, "xform");
+}
+
+
+bool GLState::detectCollision(std::shared_ptr<Mesh> ship, std::shared_ptr<Mesh> obstacle) {
+	glm::vec2 shipCoord = ship->getCurrentPosition();
+	glm::vec2 obstacleCoord = obstacle->getCurrentPosition();
+
+	shipCoord.x = shipCoord.x - (ship->getwidth() / 2);
+	shipCoord.y = shipCoord.y + (ship->getheight() / 2);
+	
+	obstacleCoord.x = obstacleCoord.x - (ship->getwidth() / 2);
+	obstacleCoord.y = obstacleCoord.y + (ship->getheight() / 2);
+
+	if ((shipCoord.x + ship->getwidth()) >= obstacleCoord.x
+	&& shipCoord.x <= (obstacleCoord.x + obstacle->getwidth())
+	&& (shipCoord.y + ship->getheight()) >= obstacleCoord.y
+	&& shipCoord.y <= (obstacleCoord.y + obstacle->getheight())) {
+		obstacle->setdestroyed(true);
+		return true;
+	}
+
+	return false;
 }

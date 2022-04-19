@@ -26,9 +26,8 @@ Camera::Camera(const CameraType cType) :
 	
 	camRot = 0.0f;
 	
-
 	if (camType == GROUND_VIEW) {
-		proj = glm::perspective(45.0f, float(getH())/float(getW()), 0.1f, 100.0f);
+		proj = glm::perspective(45.0f, float(getW()/getH()), 0.1f, 100.0f);
 		view[3][3] = 1.0f;
 		camPos = glm::vec3(0.0f, -0.25f, -1.0f);
 		view =  rotateX(-20.0) * view;
@@ -36,6 +35,7 @@ Camera::Camera(const CameraType cType) :
 		proj = glm::ortho(-0.5f, 0.5f, -0.5f, 0.5f, -2.0f, 2.0f);
 		view[3][3] = 3.0f;
 		camPos = glm::vec3(0.0f,0.0f, 0.0f);
+		view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.3f)) * view;
 		view =  rotateX(-90.0) * view;
 	}
 	updateViewProj();
@@ -69,6 +69,7 @@ void Camera::moveBackward() {
 }
 
 void Camera::updateViewProj() {
+	
 	// *********************************** TODO
 	updateView();
 }
@@ -76,11 +77,13 @@ void Camera::updateViewProj() {
 void Camera::updateView() {
 
 	if (camType == GROUND_VIEW) {
+		proj = glm::perspective(45.0f, float(getW()/getH()), 0.1f, 100.0f);
 		view =  rotateX(20.0) * view;
 		view = rotateY(camRot) * view;
 		view = myTranslate(camPos.x, camPos.y, camPos.z) * view;
 		view =  rotateX(-20.0) * view;
 	} else if (camType == OVERHEAD_VIEW) {
+		proj = glm::ortho(-0.5f, 0.5f, -0.5f, 0.5f, -2.0f, 2.0f);
 		view =  rotateX(90.0) * view;
 		view = rotateY(camRot) * view;
 		view = myTranslate(camPos.x, camPos.y, camPos.z) * view;
