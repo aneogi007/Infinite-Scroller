@@ -46,23 +46,23 @@ void GLState::paintGL() {
 
 	auto objects = scene->getSceneObjects();
 
+	auto ships = scene->getShips();
+
+	auto obstacles = scene->getObstacles();
 	//scene->printMat4(objects[0]->getModelMat());
 	
-	for (auto& meshObj : objects) {
-		if (meshObj->getModelType() == "floor" || meshObj->getModelType() == "obstacle") {
-			meshObj->moveBack(mapVelocity);
-		}
+	// for (auto& meshObj : objects) {
+	// 	glm::mat4 modelMat = meshObj->getModelMat();
+	// 	proj = (whichCam == GROUND_VIEW) ? camGround.getProj() : camOverhead.getProj();
+	// 	view = (whichCam == GROUND_VIEW) ? camGround.getView() : camOverhead.getView();
+	// 	xform = proj * view * modelMat;  // opengl does matrix multiplication from right to left
+	// 	glUniformMatrix4fv(xformLoc, 1, GL_FALSE, glm::value_ptr(xform));
+	// 	// Draw the mesh
+	// 	meshObj->draw();
+	// }
 
-		
-		// if (meshObj->getModelType() == "car") {
 
-		// 	auto bBox = meshObj->boundingBox();
-		// 	glm::vec3 minBB = bBox.first;
-		// 	glm::vec3 maxBB = bBox.second;
-
-		// 	scene->printVec3(minBB);
-		// 	scene->printVec3(maxBB);
-		// }
+	for (auto& meshObj : ships) {
 
 		glm::mat4 modelMat = meshObj->getModelMat();
 		proj = (whichCam == GROUND_VIEW) ? camGround.getProj() : camOverhead.getProj();
@@ -73,13 +73,21 @@ void GLState::paintGL() {
 		meshObj->draw();
 	}
 
+	for (auto& meshObj : obstacles) {
+		
+		meshObj->moveBack(mapVelocity);
+		
+		glm::mat4 modelMat = meshObj->getModelMat();
+		proj = (whichCam == GROUND_VIEW) ? camGround.getProj() : camOverhead.getProj();
+		view = (whichCam == GROUND_VIEW) ? camGround.getView() : camOverhead.getView();
+		xform = proj * view * modelMat;  // opengl does matrix multiplication from right to left
+		glUniformMatrix4fv(xformLoc, 1, GL_FALSE, glm::value_ptr(xform));
+		// Draw the mesh
+		meshObj->draw();
 
-	if	((!objects[2]->isdestroyed()) && detectCollision((objects[0]),(objects[2]))) {
-		std::cout << "COLLISION DETECTED " << ", ";
-	}
-
-	if	((!objects[3]->isdestroyed()) && detectCollision((objects[0]),(objects[3]))) {
-		std::cout << "COLLISION DETECTED " << ", ";
+		if ((!meshObj->isdestroyed()) && detectCollision((ships[0]),(meshObj))) {
+			std::cout << "COLLISION DETECTED " << ", ";
+		}
 	}
 
 	glUseProgram(0);
@@ -110,7 +118,7 @@ void GLState::initShaders() {
 }
 
 
-bool GLState::detectCollision(std::shared_ptr<Mesh> ship, std::shared_ptr<Mesh> obstacle) {
+bool GLState::detectCollision(std::shared_ptr<Ship> ship, std::shared_ptr<StaticObstacle> obstacle) {
 	glm::vec2 shipCoord = ship->getCurrentPosition();
 	glm::vec2 obstacleCoord = obstacle->getCurrentPosition();
 

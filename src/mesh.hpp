@@ -35,12 +35,12 @@ public:
 	inline glm::mat4 getStartModelMat() { return startModelMat; }
 
 
-	//for player movement left to right
-	void moveLeft(float speed);
-	void moveRight(float speed);
+	// //for player movement left to right
+	// void moveLeft(float speed);
+	// void moveRight(float speed);
 
 	//for obstacles and floors
-	void moveBack(float speed);
+	//void moveBack(float speed);
 
 	// Mesh vertex format
 	struct Vertex {
@@ -52,13 +52,15 @@ public:
 
 	//return current position on grid (x, z)
 	glm::vec2 getCurrentPosition() { return glm::vec2(modelMat[3][0], modelMat[3][2]); }
+	
+	void setheight(float newHeight) { height = newHeight; }
 	float getheight() { return height; }
+
+	void setwidth(float newWidth) { width = newWidth; }
 	float getwidth() { return width; }
 
 	//determines if obstacle was collided with or not
 	//reduces multiple calls for one collision
-	float isdestroyed() { return destroyed; }
-	void setdestroyed(bool flag) { destroyed = flag; }
 
 
 
@@ -79,19 +81,14 @@ protected:
 	GLuint vbuf;	// Vertex buffer
 	GLsizei vcount;	// Number of vertices
 
+
+	//holds name of the mesh
 	std::string modelType;
 
 	//Holds length and width of object (bounding box)
 	float height = 2.0f;
 	float width = 2.0f;
-
-	//how far player can move left and right on grid
-	float Xconstraint = 5.0f;
 	
-	float Zconstraint = 100.0f;
-
-	bool destroyed = false;
-
 
 private:
 };

@@ -186,32 +186,33 @@ std::vector<std::string> split(const std::string &s, char delim) {
 
 
 //For Player Movement
-void Mesh::moveLeft(float speed) {
-	//std::cout << "THIS IS THE Position " << getCurrentPosition().x << " " << getCurrentPosition().y << " ";
-	if (getCurrentPosition().x > -Xconstraint) {
-		glm::mat4 newModelMat = glm::translate(glm::mat4(1.0f), glm::vec3(-speed, 0.0f, 0.0f)) * getModelMat();
-		setModelMat(newModelMat);		
-	}
-}
-void Mesh::moveRight(float speed) {
-	//std::cout << "THIS IS THE Position " << getCurrentPosition().x << " " << getCurrentPosition().y << " ";
-	if (getCurrentPosition().x < Xconstraint) {
+// void Mesh::moveLeft(float speed) {
+// 	//std::cout << "THIS IS THE Position " << getCurrentPosition().x << " " << getCurrentPosition().y << " ";
+// 	if (getCurrentPosition().x > -Xconstraint) {
+// 		glm::mat4 newModelMat = glm::translate(glm::mat4(1.0f), glm::vec3(-speed, 0.0f, 0.0f)) * getModelMat();
+// 		setModelMat(newModelMat);		
+// 	}
+// }
+// void Mesh::moveRight(float speed) {
+// 	//std::cout << "THIS IS THE Position " << getCurrentPosition().x << " " << getCurrentPosition().y << " ";
+// 	if (getCurrentPosition().x < Xconstraint) {
 
-		glm::mat4 newModelMat = glm::translate(glm::mat4(1.0f), glm::vec3(speed, 0.0f, 0.0f)) * getModelMat();
-		setModelMat(newModelMat);		
-	}
-}
+// 		glm::mat4 newModelMat = glm::translate(glm::mat4(1.0f), glm::vec3(speed, 0.0f, 0.0f)) * getModelMat();
+// 		setModelMat(newModelMat);		
+// 	}
+// }
 
-void Mesh::moveBack(float speed) {
+
+// void Mesh::moveBack(float speed) {
 	
-	glm::mat4 newModelMat = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, speed)) * getModelMat();
+// 	glm::mat4 newModelMat = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, speed)) * getModelMat();
 	
-	if (getCurrentPosition().y >= Zconstraint) {
-		newModelMat = getStartModelMat();
-		destroyed = false;
-	}
-	//glm::mat4 newModelMat = translate * curModelMat;
-	setModelMat(newModelMat);
-}
+// 	if (getCurrentPosition().y >= Zconstraint) {
+// 		newModelMat = getStartModelMat();
+// 		destroyed = false;
+// 	}
+// 	//glm::mat4 newModelMat = translate * curModelMat;
+// 	setModelMat(newModelMat);
+// }
 
 

@@ -7,6 +7,8 @@
 #include <iostream>
 #include <glm/glm.hpp>
 #include "mesh.hpp"
+#include "ship.hpp"
+#include "staticObstacle.hpp"
 #include "gl_core_3_3.h"
 
 class Scene {
@@ -16,6 +18,8 @@ public:
 	~Scene() { objects.clear(); }
 	// access:
 	inline std::vector<std::shared_ptr<Mesh>>& getSceneObjects() { return objects; }
+	inline std::vector<std::shared_ptr<Ship>>& getShips() { return ships; }
+	inline std::vector<std::shared_ptr<StaticObstacle>>& getObstacles() { return obstacles; }
 	// output:
 	static void printMat3(const glm::mat3 mat);
 	static void printMat4(const glm::mat4 mat);
@@ -32,6 +36,10 @@ protected:
 
 	unsigned int nObj;  // number of objects in the scene
 	std::vector<std::shared_ptr<Mesh>> objects;  // mesh objects in the scene
+	std::vector<std::shared_ptr<Ship>> ships;
+	std::vector<std::shared_ptr<StaticObstacle>> obstacles;
+	
+	
 };
 
 #endif

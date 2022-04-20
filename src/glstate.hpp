@@ -37,7 +37,7 @@ public:
 
 	//PLAYER OBJECT
 	//SpaceShip
-	inline int getSpaceShip() const { return SpaceShip; }
+	inline int getCurrentSpaceShip() const { return currentSpaceShip; }
 	inline int getGround() const { return Ground; }
 
 	//movement speed
@@ -63,7 +63,7 @@ protected:
 	CameraType whichCam = GROUND_VIEW;  // which camera is active currently
 
 	// Index of SpaceShip
-	unsigned int SpaceShip = 0;
+	unsigned int currentSpaceShip = 0;
 	unsigned int Ground = 0;
 
 	float moveStep = 0.5f;  // Move step
@@ -73,9 +73,9 @@ protected:
 	float mapVelocity = 0.03f;
 
 	//Player Speed
-	float playerSpeed = 0.3f;
+	float playerSpeed = 0.9f;
 
-	bool detectCollision(std::shared_ptr<Mesh> ship, std::shared_ptr<Mesh> obstacle);
+	bool detectCollision(std::shared_ptr<Ship> ship, std::shared_ptr<StaticObstacle> obstacle);
 
 
 };

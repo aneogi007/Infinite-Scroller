@@ -120,12 +120,12 @@ void keyPress(unsigned char key, int x, int y) {	// TODO
 	// 	glutPostRedisplay();
 	// 	break;
 	case 'a': {
-		auto ship = glState->scene->getSceneObjects()[glState->getSpaceShip()];  // Currently controlled object
+		auto ship = glState->scene->getShips()[glState-> getCurrentSpaceShip()];  // Currently controlled object
 		ship->moveLeft(glState->getPlayerSpeed());
 		break;
 	}
 	case 'd': {
-		auto ship = glState->scene->getSceneObjects()[glState->getSpaceShip()];  // Currently controlled object
+		auto ship = glState->scene->getShips()[glState-> getCurrentSpaceShip()];  // Currently controlled object
 		ship->moveRight(glState->getPlayerSpeed());
 		break;
 	}

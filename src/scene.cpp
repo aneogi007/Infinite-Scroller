@@ -21,8 +21,8 @@ void Scene::parseScene() {  // TODO: rewrite
 		// Read the number of objects in the scene
 		istr.open(sceneFile);
 		istr >> nObj;
-
-		while (objects.size() < nObj) {
+		
+		for (int i = 0; i < nObj; i++) {
 			// Skip any lines that don't contain ".obj" (e.g. whitespace)
 			string line;
 			std::size_t found = std::string::npos;
@@ -33,11 +33,7 @@ void Scene::parseScene() {  // TODO: rewrite
 
 			// Load the mesh
 			string objFilename = trim(line);
-			auto mesh = std::shared_ptr<Mesh>(new Mesh((modelsDir / objFilename).string()));  // construct the mesh
-			objects.push_back(mesh);  // store the mesh
-
 			string modelName = objFilename.substr(0, objFilename.size()-4);
-			mesh->setModelType(modelName);
 
 			// TODO: read the rotation and translation of the mesh
 
@@ -48,7 +44,7 @@ void Scene::parseScene() {  // TODO: rewrite
 			// | 	rXz, rYz, rZz, 0   |
 			// |__  tx,  ty,  tz,  1 __|
 			//
-			
+
 			float rXx, rXy, rXz, rYx, rYy, rYz, rZx, rZy, rZz, tx, ty, tz;
 			istr >> rXx >> rXy >> rXz >>  rYx >> rYy >> rYz >> rZx >> rZy >> rZz >> tx >> ty >> tz;
 
@@ -59,12 +55,30 @@ void Scene::parseScene() {  // TODO: rewrite
 			  	tx,  ty,  tz,  1 
 			);
 
-			if (mesh->getModelType() == "floor" || mesh->getModelType() == "obstacle") {
+			if (modelName == "car") {
+				auto mosh = std::shared_ptr<Ship>(new Ship((modelsDir / objFilename).string(), 2.0f));  // construct the mesh
+				ships.push_back(mosh);  // store the mesh
+				mosh->setModelMat(model);
+				mosh->setModelType(modelName);
+			} else if (modelName == "obstacle") {
+				
+				int numObstacles = 1;
+				for (int j = 0; j < numObstacles; j++) {
+					auto mesh = std::shared_ptr<StaticObstacle>(new StaticObstacle((modelsDir / objFilename).string()));  // construct the mesh
+					obstacles.push_back(mesh);  // store the mesh
+					mesh->setModelMat(model);
+					mesh->setModelType(modelName);
+					mesh->setSpawnMat(model);
+					mesh->setNewSpawn();
+				}
+				
+			} else {
+				auto mesh = std::shared_ptr<Mesh>(new Mesh((modelsDir / objFilename).string()));  // construct the mesh
+				objects.push_back(mesh);  // store the mesh
 				mesh->setStartModelMat(model);
+				mesh->setModelMat(model);
+				mesh->setModelType(modelName);
 			}
-
-			mesh->setModelMat(model);
-
 		}
 	}
 	catch (const std::exception& e) {
