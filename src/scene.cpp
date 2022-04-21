@@ -55,14 +55,28 @@ void Scene::parseScene() {  // TODO: rewrite
 			  	tx,  ty,  tz,  1 
 			);
 
-			if (modelName == "car") {
-				auto mosh = std::shared_ptr<Ship>(new Ship((modelsDir / objFilename).string(), 2.0f));  // construct the mesh
+			if (modelName == "motorcycle") {
+				float speed = .02f;
+				float drag = 1.5f;
+				float height = 10.0f;
+				float width = 0.5f;
+				auto mosh = std::shared_ptr<Ship>(new Ship((modelsDir / objFilename).string(), speed, drag, height, width));  // construct the mesh
 				ships.push_back(mosh);  // store the mesh
 				mosh->setModelMat(model);
 				mosh->setModelType(modelName);
+			} else if (modelName == "car") {
+				float speed = .01f;
+				float drag = 1.0f;
+				float height = 3.0f;
+				float width = 2.0f;
+				auto mosh = std::shared_ptr<Ship>(new Ship((modelsDir / objFilename).string(), speed, drag, height, width));  // construct the mesh
+				ships.push_back(mosh);  // store the mesh
+				mosh->setModelMat(model);
+				mosh->setModelType(modelName);
+				
 			} else if (modelName == "obstacle") {
 				
-				int numObstacles = 1;
+				int numObstacles = 2;
 				for (int j = 0; j < numObstacles; j++) {
 					auto mesh = std::shared_ptr<StaticObstacle>(new StaticObstacle((modelsDir / objFilename).string()));  // construct the mesh
 					obstacles.push_back(mesh);  // store the mesh
@@ -72,13 +86,16 @@ void Scene::parseScene() {  // TODO: rewrite
 					mesh->setNewSpawn();
 				}
 				
-			} else {
-				auto mesh = std::shared_ptr<Mesh>(new Mesh((modelsDir / objFilename).string()));  // construct the mesh
-				objects.push_back(mesh);  // store the mesh
-				mesh->setStartModelMat(model);
-				mesh->setModelMat(model);
-				mesh->setModelType(modelName);
-			}
+			} else if (modelName == "floor") {
+				int numObstacles = 1;
+				for (int j = 0; j < numObstacles; j++) {
+					auto mesh = std::shared_ptr<Floor>(new Floor((modelsDir / objFilename).string()));  // construct the mesh
+					floors.push_back(mesh);  // store the mesh
+					mesh->setModelMat(model);
+					mesh->setModelType(modelName);
+					mesh->setSpawn(model);
+				}
+			} 
 		}
 	}
 	catch (const std::exception& e) {

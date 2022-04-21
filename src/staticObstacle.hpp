@@ -21,20 +21,12 @@ class StaticObstacle: public Mesh {
         
 
     protected:
-        
-        //how far player can move left and right on grid
-        // float xXconstraint = 5.0f;
-
-        // bool xdestroyed = false;
-
-        // float xSpd;
-        //how far player can move left and right on grid
 
         std::string obsName;
 
         glm::mat4 spawnMat = glm::mat4(1.0f);
 
-        float Zconstraint = 10.0f;
+        float Zconstraint = 20.0f;
 	    bool destroyed = false;
 
 

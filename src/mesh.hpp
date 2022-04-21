@@ -44,8 +44,10 @@ public:
 
 	// Mesh vertex format
 	struct Vertex {
-		glm::vec3 pos;		// Position
-		glm::vec3 norm;		// Normal
+		glm::vec3 pos;			// Position
+		glm::vec3 face_norm;	// Face normal
+		glm::vec3 smooth_norm;	// Smoothed normal
+		Vertex();
 	};
 	// Local geometry data
 	std::vector<Vertex> vertices;

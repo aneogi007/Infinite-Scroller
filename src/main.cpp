@@ -37,6 +37,7 @@ int main(int argc, char** argv) {
 		// Initialize OpenGL (buffers, shaders, etc.)
 		glState = std::unique_ptr<GLState>(new GLState());
 		glState->initializeGL();
+		glState->parseLights();
 
 	} catch (const std::exception& e) {
 		// Handle any errors
@@ -119,14 +120,32 @@ void keyPress(unsigned char key, int x, int y) {	// TODO
 	// 	glState->getCamera(glState->getCamType()).moveBackward();
 	// 	glutPostRedisplay();
 	// 	break;
+	case 'c': {
+		if (glState->getCurrentSpaceShip() == 0) {
+			glState->setCurrentSpaceShip(1);
+		} else {
+			glState->setCurrentSpaceShip(0);
+		}
+		
+		break;
+	}
+
 	case 'a': {
-		auto ship = glState->scene->getShips()[glState-> getCurrentSpaceShip()];  // Currently controlled object
-		ship->moveLeft(glState->getPlayerSpeed());
+		// auto ship = glState->scene->getShips()[glState-> getCurrentSpaceShip()];  // Currently controlled object
+		// ship->moveLeft(glState->getPlayerSpeed());
+		//if (!glState->isMovingRight()){
+			glState->setMovingLeft(true);
+		//}
+		glState->setKeyPress(true);
 		break;
 	}
 	case 'd': {
-		auto ship = glState->scene->getShips()[glState-> getCurrentSpaceShip()];  // Currently controlled object
-		ship->moveRight(glState->getPlayerSpeed());
+		// auto ship = glState->scene->getShips()[glState-> getCurrentSpaceShip()];  // Currently controlled object
+		// ship->moveRight(glState->getPlayerSpeed());
+		//if (!glState->isMovingLeft()) {
+			glState->setMovingRight(true);
+		//}
+		glState->setKeyPress(true);
 		break;
 	}
 	default:
@@ -134,11 +153,45 @@ void keyPress(unsigned char key, int x, int y) {	// TODO
 	}
 }
 
+
+
 // Called when a key is released
 void keyRelease(unsigned char key, int x, int y) {
+	auto ship = glState->scene->getShips()[glState-> getCurrentSpaceShip()];
+
 	switch (key) {
 	case 27:	// Escape key
 		menu(MENU_EXIT);
+		break;
+	case 97:
+		glState->setMovingLeft(false);
+		if (ship->inDragState() == false && !glState->isMovingRight()) {
+			ship->setDragState(true);
+
+			ship->smartDragLeft(glState->getKeyPressTime());
+			// if(glState->getKeyPressTime() > 50) {
+			// 	ship->largeDragLeft();
+			// } else {
+			// 	ship->smallDragLeft();
+			// }
+		}
+		
+		glState->setKeyPress(false);
+		break;
+	case 100:
+		glState->setMovingRight(false);
+		if (ship->inDragState() == false && !glState->isMovingLeft()) {
+			
+			ship->setDragState(true);
+			// if(glState->getKeyPressTime() > 50) {
+			// 	ship->largeDragRight();
+			// } else {
+			// 	ship->smallDragRight();
+			// }
+			ship->smartDragRight(glState->getKeyPressTime());
+		}
+		
+		glState->setKeyPress(false);
 		break;
 	}
 }

@@ -18,7 +18,7 @@ glm::vec3 camPos;  // camera position
 Camera::Camera(const CameraType cType) :
 	camType(cType),
 	width(1), height(1),
-	fovy(45.0f),
+	fovy(90.0f),
 	view(glm::mat4(1.0f)), proj(glm::mat4(1.0f)) {
 
 	// *********************************** TODO: this line below is hard-coded to help you get a better initial view of the scene, REMOVE it afterwards

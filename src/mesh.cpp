@@ -10,6 +10,13 @@
 int indexOfNumberLetter(std::string& str, int offset);
 int lastIndexOfNumberLetter(std::string& str);
 std::vector<std::string> split(const std::string &s, char delim);
+float findAngle(glm::vec3 a , glm::vec3 b);
+
+// Vertex constructor
+Mesh::Vertex::Vertex() :
+	pos(glm::vec3(0.0f, 0.0f, 0.0f)),
+	face_norm(glm::vec3(1.0f, 0.0f, 0.0f)),
+	smooth_norm(glm::vec3(0.0f, 1.0f, 0.0f)) {}
 
 // Constructor - load mesh from file
 Mesh::Mesh(std::string filename, bool keepLocalGeometry) {
@@ -43,11 +50,9 @@ void Mesh::load(std::string filename, bool keepLocalGeometry) {
 		throw std::runtime_error(ss.str());
 	}
 
-	// Store vertex and normal data while reading
+	// Store vertex data while reading
 	std::vector<glm::vec3> raw_vertices;
-	std::vector<glm::vec3> raw_normals;
 	std::vector<unsigned int> v_elements;
-	std::vector<unsigned int> n_elements;
 
 	std::string line;
 	while (getline(file, line)) {
@@ -62,12 +67,6 @@ void Mesh::load(std::string filename, bool keepLocalGeometry) {
 			// Update bounding box
 			minBB = glm::min(minBB, vert);
 			maxBB = glm::max(maxBB, vert);
-		} else if (line.substr(0, 3) == "vn ") {
-			// Read normal data
-			int index1 = indexOfNumberLetter(line, 2);
-			int index2 = lastIndexOfNumberLetter(line);
-			std::vector<std::string> values = split(line.substr(index1, index2 - index1 + 1), ' ');
-			raw_normals.push_back(glm::vec3(stof(values[0]), stof(values[1]), stof(values[2])));
 
 		} else if (line.substr(0, 2) == "f ") {
 			// Read face data
@@ -84,13 +83,6 @@ void Mesh::load(std::string filename, bool keepLocalGeometry) {
 				v_elements.push_back(stoul(v1[0]) - 1);
 				v_elements.push_back(stoul(v2[0]) - 1);
 				v_elements.push_back(stoul(v3[0]) - 1);
-
-				// Check for normals
-				if (v1.size() >= 3 && v1[2].length() > 0) {
-					n_elements.push_back(stoul(v1[2]) - 1);
-					n_elements.push_back(stoul(v2[2]) - 1);
-					n_elements.push_back(stoul(v3[2]) - 1);
-				}
 			}
 		}
 	}
@@ -103,6 +95,11 @@ void Mesh::load(std::string filename, bool keepLocalGeometry) {
 		throw std::runtime_error(ss.str());
 	}
 
+	// TODO ========================================================================
+	// Calculate face and smoothed normals
+	std::vector<glm::vec3> face_normals(v_elements.size());
+	std::vector<glm::vec3> accumulated_normals(raw_vertices.size(), glm::vec3(0.0f));
+
 	// Create vertex array
 	vertices = std::vector<Vertex>(v_elements.size());
 	for (int i = 0; i < int(v_elements.size()); i += 3) {
@@ -111,21 +108,40 @@ void Mesh::load(std::string filename, bool keepLocalGeometry) {
 		vertices[i+1].pos = raw_vertices[v_elements[i+1]];
 		vertices[i+2].pos = raw_vertices[v_elements[i+2]];
 
-		// Check for normals
-		if (n_elements.size() > 0) {
-			// Store normals
-			vertices[i+0].norm = raw_normals[n_elements[i+0]];
-			vertices[i+1].norm = raw_normals[n_elements[i+1]];
-			vertices[i+2].norm = raw_normals[n_elements[i+2]];
-		} else {
-			// Calculate normal
-			glm::vec3 normal = normalize(cross(vertices[i+1].pos - vertices[i+0].pos,
-				vertices[i+2].pos - vertices[i+0].pos));
-			vertices[i+0].norm = normal;
-			vertices[i+1].norm = normal;
-			vertices[i+2].norm = normal;
-		}
+
+
+		// TODO ====================================================================
+		// Store face and smoothed normals in each vertex
+		
+		glm::vec3 vec1 = vertices[i+0].pos - vertices[i+1].pos;
+		glm::vec3 vec2 = vertices[i+0].pos - vertices[i+2].pos;
+		glm::vec3 triangle_norm = (glm::cross(vec1, vec2));
+		face_normals[i] = triangle_norm;
+
+		vertices[i+0].face_norm = face_normals[i];
+		vertices[i+1].face_norm = face_normals[i];
+		vertices[i+2].face_norm = face_normals[i];
+
+		float v1angle = findAngle((vertices[i+1].pos - vertices[i+0].pos), (vertices[i+2].pos - vertices[i+0].pos));
+		float v2angle = findAngle((vertices[i+0].pos - vertices[i+1].pos), (vertices[i+2].pos - vertices[i+1].pos));
+		float v3angle = findAngle((vertices[i+0].pos - vertices[i+2].pos), (vertices[i+1].pos - vertices[i+2].pos));
+
+		accumulated_normals[v_elements[i+0]] += (glm::cross(vec1, vec2) * v1angle);
+		accumulated_normals[v_elements[i+1]] += (glm::cross(vec1, vec2) * v2angle);
+		accumulated_normals[v_elements[i+2]] += (glm::cross(vec1, vec2) * v3angle);
+		//accumulated_normals.push_back(triangle_norm);
+
+		//Vertex.face_norm
+	} 
+
+	for (int i = 0; i < int(v_elements.size()); i += 3) {
+		vertices[i+0].smooth_norm = glm::normalize(accumulated_normals[v_elements[i+0]]);
+		vertices[i+1].smooth_norm = glm::normalize(accumulated_normals[v_elements[i+1]]);
+		vertices[i+2].smooth_norm = glm::normalize(accumulated_normals[v_elements[i+2]]);
+
 	}
+
+
 	vcount = (GLsizei)vertices.size();
 
 	// Load vertices into OpenGL
@@ -140,6 +156,8 @@ void Mesh::load(std::string filename, bool keepLocalGeometry) {
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), NULL);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)sizeof(glm::vec3));
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(2 * sizeof(glm::vec3)));
 
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -147,6 +165,20 @@ void Mesh::load(std::string filename, bool keepLocalGeometry) {
 	// Delete local copy of geometry
 	if (!keepLocalGeometry)
 		vertices.clear();
+}
+
+float findAngle(glm::vec3 a, glm::vec3 b) {
+
+	// glm::vec3 da= glm::normalize(a);
+ 	// glm::vec3 db= glm::normalize(b);
+ 	// return glm::acos(glm::dot(da, db));
+
+	 float angle = glm::dot(a, b);
+	 angle = angle / (glm::length(a) * glm::length(b));
+	 angle = glm::acos(angle);
+	 return angle; 
+
+
 }
 
 // Release resources
@@ -183,36 +215,3 @@ std::vector<std::string> split(const std::string &s, char delim) {
 
     return elems;
 }
-
-
-//For Player Movement
-// void Mesh::moveLeft(float speed) {
-// 	//std::cout << "THIS IS THE Position " << getCurrentPosition().x << " " << getCurrentPosition().y << " ";
-// 	if (getCurrentPosition().x > -Xconstraint) {
-// 		glm::mat4 newModelMat = glm::translate(glm::mat4(1.0f), glm::vec3(-speed, 0.0f, 0.0f)) * getModelMat();
-// 		setModelMat(newModelMat);		
-// 	}
-// }
-// void Mesh::moveRight(float speed) {
-// 	//std::cout << "THIS IS THE Position " << getCurrentPosition().x << " " << getCurrentPosition().y << " ";
-// 	if (getCurrentPosition().x < Xconstraint) {
-
-// 		glm::mat4 newModelMat = glm::translate(glm::mat4(1.0f), glm::vec3(speed, 0.0f, 0.0f)) * getModelMat();
-// 		setModelMat(newModelMat);		
-// 	}
-// }
-
-
-// void Mesh::moveBack(float speed) {
-	
-// 	glm::mat4 newModelMat = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, speed)) * getModelMat();
-	
-// 	if (getCurrentPosition().y >= Zconstraint) {
-// 		newModelMat = getStartModelMat();
-// 		destroyed = false;
-// 	}
-// 	//glm::mat4 newModelMat = translate * curModelMat;
-// 	setModelMat(newModelMat);
-// }
-
-

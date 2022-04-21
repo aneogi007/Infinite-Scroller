@@ -24,6 +24,8 @@ void StaticObstacle::setNewSpawn() {
 	float rDum = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/10.0f));
     rDum = rDum - 5.0f;
 	//std::cout << rDum << "\n";
+	height = 3.0f;
+	//width = 3.0f
 
     spawnMat[3][0] = rDum;
     //get random value inbetween -5 and 5
