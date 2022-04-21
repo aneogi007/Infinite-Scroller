@@ -1,7 +1,0 @@
-# 8 vertices and 12 faces
-v -5 -5 0
-v -5 5 0
-v 5 -5 0
-v 5 5 0
-f 2 3 4
-f 3 2 1
