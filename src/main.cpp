@@ -8,6 +8,11 @@
 
 namespace fs = std::filesystem;
 
+// START SCREEN  - DONE
+// END SCREEN    - DONE
+// HIGH SCORE    - DONE
+// TODO: CHANGE COLOR OF THE CAR (customization)
+
 // Menu identifiers
 const int MENU_EXIT = 1;					// Exit application
 std::vector<std::string> meshFilenames;		// Paths to .obj files to load
@@ -63,7 +68,7 @@ void initGLUT(int* argc, char** argv) {
 	glutInitContextProfile(GLUT_CORE_PROFILE);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 	// Create the window
-	glutCreateWindow("FreeGLUT Window");
+	glutCreateWindow("Hyperspace");
 
 	// Create a menu
 
@@ -99,10 +104,32 @@ void reshape(GLint width, GLint height) {
 }
 
 void keyPress(unsigned char key, int x, int y) {	// TODO
+	auto ship = glState->scene->getShips()[glState-> getCurrentSpaceShip()];
 	switch (key) {
 	case 's':  // switch camera	
-		glState->switchCam();
-		glutPostRedisplay();	// Request redraw
+		//glState->switchCam();
+		//glutPostRedisplay();	// Request redraw
+		if(glState->getGameState() == glState->MENU) {
+			glState->setGameState(glState->GAME);
+			glState->initGameState();
+		}
+		else if (glState->getGameState() == glState->WELCOME) {
+			glState->setGameState(glState->MENU);
+		}
+		break;
+	case 13:
+		if (glState->getGameState() == glState->MENU) {
+			glState->setGameState(glState->GAME);
+			glState->initGameState();
+		}
+		else if (glState->getGameState() == glState->WELCOME) {
+			glState->setGameState(glState->MENU);
+		}
+		else if (glState->getGameState() == glState->OVER) {
+			glState->setGameState(glState->GAME);
+			glState->initGameState();
+
+		}
 		break;
 	// case 'a':  // turn left
 	// 	glState->getCamera(glState->getCamType()).turnLeft();
@@ -121,31 +148,34 @@ void keyPress(unsigned char key, int x, int y) {	// TODO
 	// 	glutPostRedisplay();
 	// 	break;
 	case 'c': {
-		if (glState->getCurrentSpaceShip() == 0) {
-			glState->setCurrentSpaceShip(1);
-		} else {
-			glState->setCurrentSpaceShip(0);
-		}
 		
 		break;
 	}
 
+	case 'm': {
+		glState->initMenuState();
+		glState->setGameState(glState->MENU);
+		break;
+	}
+
 	case 'a': {
-		// auto ship = glState->scene->getShips()[glState-> getCurrentSpaceShip()];  // Currently controlled object
-		// ship->moveLeft(glState->getPlayerSpeed());
-		//if (!glState->isMovingRight()){
-			glState->setMovingLeft(true);
-		//}
-		glState->setKeyPress(true);
+		if (glState->getGameState() == glState->GAME) {
+			ship->setLeftMove(true);
+		} 
 		break;
 	}
 	case 'd': {
-		// auto ship = glState->scene->getShips()[glState-> getCurrentSpaceShip()];  // Currently controlled object
-		// ship->moveRight(glState->getPlayerSpeed());
-		//if (!glState->isMovingLeft()) {
-			glState->setMovingRight(true);
-		//}
-		glState->setKeyPress(true);
+
+		if (glState->getGameState() == glState->GAME) {
+			ship->setRightMove(true);
+			
+		} else if (glState->getGameState() == glState->MENU) {
+			if (glState->getCurrentSpaceShip() == 0) {
+				glState->setCurrentSpaceShip(1);
+			} else {
+				glState->setCurrentSpaceShip(0);
+			}
+		}
 		break;
 	}
 	default:
@@ -164,33 +194,17 @@ void keyRelease(unsigned char key, int x, int y) {
 		menu(MENU_EXIT);
 		break;
 	case 97:
-		glState->setMovingLeft(false);
-		if (ship->inDragState() == false && !glState->isMovingRight()) {
-			ship->setDragState(true);
+	
+		ship->setLeftMove(false);
+		ship->setdriftMode(true);
 
-			ship->smartDragLeft(glState->getKeyPressTime());
-			// if(glState->getKeyPressTime() > 50) {
-			// 	ship->largeDragLeft();
-			// } else {
-			// 	ship->smallDragLeft();
-			// }
-		}
-		
 		glState->setKeyPress(false);
 		break;
 	case 100:
-		glState->setMovingRight(false);
-		if (ship->inDragState() == false && !glState->isMovingLeft()) {
-			
-			ship->setDragState(true);
-			// if(glState->getKeyPressTime() > 50) {
-			// 	ship->largeDragRight();
-			// } else {
-			// 	ship->smallDragRight();
-			// }
-			ship->smartDragRight(glState->getKeyPressTime());
-		}
 		
+		ship->setRightMove(false);
+		ship->setdriftMode(true);
+
 		glState->setKeyPress(false);
 		break;
 	}

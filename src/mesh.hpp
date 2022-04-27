@@ -61,6 +61,8 @@ public:
 	void setwidth(float newWidth) { width = newWidth; }
 	float getwidth() { return width; }
 
+	glm::vec3 getObjColor() { return objColor; };
+
 	//determines if obstacle was collided with or not
 	//reduces multiple calls for one collision
 
@@ -91,6 +93,8 @@ protected:
 	float height = 2.0f;
 	float width = 2.0f;
 	
+	glm::vec3 objColor;
+
 
 private:
 };

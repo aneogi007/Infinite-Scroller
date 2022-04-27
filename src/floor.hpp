@@ -7,7 +7,12 @@ class Floor: public Mesh {
     public:
         
         Floor(std::string filename) : 
-        Mesh(filename) {}
+        Mesh(filename) {
+            objColor.r = 50;
+            objColor.g = 50;
+            objColor.b = 50;
+            objColor /= 255.0f;
+        }
 
         //for player movement left to right
         void moveBack(float speed);

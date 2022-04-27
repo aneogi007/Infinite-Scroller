@@ -55,25 +55,36 @@ void Scene::parseScene() {  // TODO: rewrite
 			  	tx,  ty,  tz,  1 
 			);
 
-			if (modelName == "motorcycle") {
+			if (modelName == "xwing") {
 				float speed = .02f;
 				float drag = 1.5f;
 				float height = 10.0f;
 				float width = 0.5f;
-				auto mosh = std::shared_ptr<Ship>(new Ship((modelsDir / objFilename).string(), speed, drag, height, width));  // construct the mesh
-				ships.push_back(mosh);  // store the mesh
-				mosh->setModelMat(model);
-				mosh->setModelType(modelName);
+				auto mesh = std::shared_ptr<Ship>(new Ship((modelsDir / objFilename).string(), speed, drag, height, width));  // construct the mesh
+				ships.push_back(mesh);  // store the mesh
+				mesh->setModelMat(model);
+				mesh->setSpawnMat(model);
+				mesh->setModelType("X-WING");
+				mesh->setSpeedText("Speed: -----");
+				mesh->setControlText("Control: --");
+				model[3][1] = -2.2;
+				model[3][2] = -2;
+				mesh->setMenuMat(model);
 			} else if (modelName == "car") {
 				float speed = .01f;
 				float drag = 1.0f;
 				float height = 3.0f;
 				float width = 2.0f;
-				auto mosh = std::shared_ptr<Ship>(new Ship((modelsDir / objFilename).string(), speed, drag, height, width));  // construct the mesh
-				ships.push_back(mosh);  // store the mesh
-				mosh->setModelMat(model);
-				mosh->setModelType(modelName);
-				
+				auto mesh = std::shared_ptr<Ship>(new Ship((modelsDir / objFilename).string(), speed, drag, height, width));  // construct the mesh
+				ships.push_back(mesh);  // store the mesh
+				mesh->setModelMat(model);
+				mesh->setSpawnMat(model);
+				mesh->setModelType("CAR");
+				mesh->setSpeedText("Speed: ---");
+				mesh->setControlText("Control: ----");
+				model[3][1] = -2.7;
+				model[3][2] = -2;
+				mesh->setMenuMat(model);
 			} else if (modelName == "obstacle") {
 				
 				int numObstacles = 2;
@@ -85,15 +96,18 @@ void Scene::parseScene() {  // TODO: rewrite
 					mesh->setSpawnMat(model);
 					mesh->setNewSpawn();
 				}
-				
 			} else if (modelName == "floor") {
-				int numObstacles = 1;
-				for (int j = 0; j < numObstacles; j++) {
+				int numFloors = 8;
+				float diffZ = -150.0f;
+				for (int j = 0; j < numFloors; j++) {
 					auto mesh = std::shared_ptr<Floor>(new Floor((modelsDir / objFilename).string()));  // construct the mesh
-					floors.push_back(mesh);  // store the mesh
-					mesh->setModelMat(model);
-					mesh->setModelType(modelName);
 					mesh->setSpawn(model);
+					glm::mat4 newModel = model;
+					newModel[3][2] = diffZ;
+					mesh->setModelMat(newModel);
+					mesh->setModelType(modelName);
+					floors.push_back(mesh);  // store the mesh
+					diffZ = diffZ + 21.25f;
 				}
 			} 
 		}

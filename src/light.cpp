@@ -6,6 +6,7 @@
 #include "util.hpp"
 #include <iostream>
 
+
 // Static Light members (OpenGL state)
 unsigned int Light::refcount = 0;
 std::array<bool, Light::MAX_LIGHTS> Light::enabledLights;

@@ -9,6 +9,7 @@
 #include "camera.hpp"
 #include "scene.hpp"
 #include "light.hpp"
+#include "gtext.hpp"
 
 // Manages OpenGL state, e.g. camera transform, objects, shaders
 class GLState {
@@ -81,9 +82,27 @@ public:
 	void setKeyPress(bool isPress) { keyPress = isPress; }
 	int getKeyPressTime() { return keyPressTime; }
 
+	
 
 	
+
+	enum gameState {
+		MENU = 0,
+		GAME = 1,
+		WELCOME = -1,
+		OVER = 2
+	};
 	
+	void initGameState();
+	void initMenuState();
+	void setGameState(gameState state) { gState = state ;} 
+	gameState getGameState() { return (gameState)gState; }
+
+	void runMenu();
+	void runWelcome();
+	void runGame();
+	void runOver();
+
 
 protected:
 	bool init;
@@ -107,6 +126,22 @@ protected:
 	GLuint specStrLoc;		// Specular strength location
 	GLuint specExpLoc;		// Specular exponent location
 
+	Gtext countText;
+	Gtext menuText;
+	Gtext menuNameText;
+	Gtext menuSpeedText;
+	Gtext menuControlText;
+
+	Gtext welcomeText;
+	Gtext hyperspaceText;
+	Gtext movementText;
+	Gtext enterText;
+	Gtext returnText;
+
+	Gtext overText;
+	Gtext scoreText;
+	Gtext highscoreText;
+
 
 
 	// cameras:
@@ -114,6 +149,10 @@ protected:
 	CameraType whichCam = GROUND_VIEW;  // which camera is active currently
 
 	
+	//int gState = MENU;					// start up game with menu
+	int gState = WELCOME;
+
+	int highScore = 0;						// keeps track of high score
 
 	// Index of SpaceShip
 	unsigned int currentSpaceShip = 0;
@@ -135,6 +174,12 @@ protected:
 
 	float keyPress = false;
 	int keyPressTime = 0;
+
+	glm::mat4 proj, view;
+	GLfloat Textview[16];
+	GLfloat Textproj[16];
+
+	int score = 0;
 
 };
 

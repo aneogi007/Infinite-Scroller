@@ -7,7 +7,13 @@ class StaticObstacle: public Mesh {
     public:
         
         StaticObstacle(std::string filename) : 
-         Mesh(filename) {}
+         Mesh(filename) {
+
+            objColor.r = 120;
+            objColor.g = 188;
+            objColor.b = 196;
+            objColor /= 255.0f;
+         }
 
         //for player movement left to right
         void moveBack(float speed);
